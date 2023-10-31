@@ -1,13 +1,26 @@
+''' 
+Command: python3 15_classifier_ovo.py <filename>
+Example: python3 15_classifier_ovo.py penguins_test.csv
+'''
+
+
 # Import libraries
 import pandas as pd       # Importing for panel data analysis
 import numpy as np
 import pickle             # Loading model
+import sys
 import warnings           # Importing warning to disable runtime warnings
 warnings.filterwarnings("ignore") 
 
+
 ''' Let's analyze the data in **penguins_test.csv** '''
 # Import training data into pandas dataframe
-test_csv = pd.read_csv('./penguins_test.csv')
+if (len(sys.argv) == 1):
+    print("Filename argument missing. Taking the default file \"penguins_test.csv\" for making predictions")
+    filename = './penguins_test.csv'
+else:
+    filename = str(sys.argv[1])
+test_csv = pd.read_csv(filename)
 # print('Shape of the dataset:', test_csv.shape)
 # test_csv.head(3)
 
@@ -37,11 +50,11 @@ X_encoded.replace({True: 1, False: 0}, inplace=True)
 svm_classifiers_ovo = {} # Initialize a dictionary to store classifiers for each of the three binary class problems
 
 # load the model from disk
-loaded_model_adelie_gentoo = pickle.load(open('./ovo_svm_final_adelie_gentoo.sav', 'rb'))
+loaded_model_adelie_gentoo = pickle.load(open('./models/ovo_svm_final_adelie_gentoo.sav', 'rb'))
 svm_classifiers_ovo[('Adelie Penguin (Pygoscelis adeliae)', 'Gentoo penguin (Pygoscelis papua)')] = loaded_model_adelie_gentoo
-loaded_model_adelie_chinstrap = pickle.load(open('./ovo_svm_final_adelie_chinstrap.sav', 'rb'))
+loaded_model_adelie_chinstrap = pickle.load(open('./models/ovo_svm_final_adelie_chinstrap.sav', 'rb'))
 svm_classifiers_ovo[('Adelie Penguin (Pygoscelis adeliae)', 'Chinstrap penguin (Pygoscelis antarctica)')] = loaded_model_adelie_chinstrap
-loaded_model_gentoo_chinstrap = pickle.load(open('./ovo_svm_final_gentoo_chinstrap.sav', 'rb'))
+loaded_model_gentoo_chinstrap = pickle.load(open('./models/ovo_svm_final_gentoo_chinstrap.sav', 'rb'))
 svm_classifiers_ovo[('Gentoo penguin (Pygoscelis papua)', 'Chinstrap penguin (Pygoscelis antarctica)')] = loaded_model_gentoo_chinstrap
 # print(svm_classifiers_ovo)
 # it should be of the form:
@@ -77,3 +90,7 @@ print("predictions for all Test rows: ", predictions_ovo)
 # Appending the prediction results in the dataframe
 test_csv['predicted'] = np.array(predictions_ovo)
 test_csv.to_csv('ovo.csv', index=False)
+
+print("*"*10)
+print("*"*10)
+print("Successfully created the file ovo.csv")

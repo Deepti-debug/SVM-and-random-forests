@@ -1,10 +1,24 @@
+''' 
+Command: python3 15_classifier_ova.py <filename>
+Example: python3 15_classifier_ova.py penguins_test.csv
+'''
+
+
 # Import libraries
 import pandas as pd       # Importing for panel data analysis
+import sys
 import pickle             # Loading model
+
+# print('Number of arguments:', len(sys.argv), 'arguments.')
 
 ''' Let's analyze the data in **penguins_test.csv** '''
 # Import training data into pandas dataframe
-test_csv = pd.read_csv('./penguins_test.csv')
+if (len(sys.argv) == 1):
+    print("Filename argument missing. Taking the default file \"penguins_test.csv\" for making predictions")
+    filename = './penguins_test.csv'
+else:
+    filename = str(sys.argv[1])
+test_csv = pd.read_csv(filename)
 # print('Shape of the dataset:', test_csv.shape)
 # test_csv.head(3)
 
@@ -34,11 +48,11 @@ X_encoded.replace({True: 1, False: 0}, inplace=True)
 svm_classifiers_ova = {} # Initialize a dictionary to store classifiers for each of the three binary class problems
 
 # load the model from disk
-loaded_model_adelie = pickle.load(open('./ova_svm_final_adelie.sav', 'rb'))
+loaded_model_adelie = pickle.load(open('./models/ova_svm_final_adelie.sav', 'rb'))
 svm_classifiers_ova['Adelie Penguin (Pygoscelis adeliae)'] = loaded_model_adelie
-loaded_model_gentoo = pickle.load(open('./ova_svm_final_gentoo.sav', 'rb'))
+loaded_model_gentoo = pickle.load(open('./models/ova_svm_final_gentoo.sav', 'rb'))
 svm_classifiers_ova['Gentoo penguin (Pygoscelis papua)'] = loaded_model_gentoo
-loaded_model_chinstrap = pickle.load(open('./ova_svm_final_chinstrap.sav', 'rb'))
+loaded_model_chinstrap = pickle.load(open('./models/ova_svm_final_chinstrap.sav', 'rb'))
 svm_classifiers_ova['Chinstrap penguin (Pygoscelis antarctica)'] = loaded_model_chinstrap
 # print(svm_classifiers_ova)
 # it should be of the form:
@@ -64,3 +78,7 @@ print(y_pred_multiclass_ova)
 # Appending the prediction results in the dataframe
 test_csv['predicted'] = y_pred_multiclass_ova.values
 test_csv.to_csv('ova.csv', index=False)
+
+print("*"*10)
+print("*"*10)
+print("Successfully created the file ova.csv")
